@@ -23,4 +23,12 @@ resource "aws_s3_bucket" "hosting" {
   versioning {
     enabled = true
   }
+  cors_rule {
+    allowed_headers = ["Authorization"]
+    allowed_methods = ["GET", "HEAD"]
+    allowed_origins = ["*"]
+    expose_headers  = []
+    max_age_seconds = 3000
+  }
+
 }
