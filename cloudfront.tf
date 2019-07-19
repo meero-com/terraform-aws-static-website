@@ -50,6 +50,7 @@ resource "aws_cloudfront_distribution" "web_dist" {
 
     forwarded_values {
       query_string = false
+      headers      = ["Origin", "Referer"]
 
       cookies {
         forward = "none"
