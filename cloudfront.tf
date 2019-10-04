@@ -83,7 +83,7 @@ resource "aws_cloudfront_distribution" "web_dist" {
 
       forwarded_values {
         query_string = "true"
-        headers      = ["*"]
+        headers      = ["Host", "cache-control", "context-type", "content-encoding", "x-meero-region"]
 
         cookies {
           forward = "all"
