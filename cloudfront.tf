@@ -65,26 +65,29 @@ resource "aws_cloudfront_distribution" "web_dist" {
   dynamic ordered_cache_behavior {
     for_each = var.activate_lambda_sign ? { "dummy" : "dummy" } : {}
 
-    path_pattern = "/upload/v4/sign"
+    content {
 
-    allowed_methods  = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = local.s3_origin_id
+      path_pattern = "/upload/v4/sign"
 
-    viewer_protocol_policy = "redirect-to-https"
+      allowed_methods  = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+      cached_methods   = ["GET", "HEAD"]
+      target_origin_id = local.s3_origin_id
 
-    lambda_function_association {
-      lambda_arn   = aws_lambda_function.this.qualified_arn
-      event_type   = "viewer-request"
-      include_body = true
-    }
+      viewer_protocol_policy = "redirect-to-https"
 
-    forwarded_values {
-      query_string = "true"
-      headers      = ["*"]
+      lambda_function_association {
+        lambda_arn   = aws_lambda_function.this.qualified_arn
+        event_type   = "viewer-request"
+        include_body = true
+      }
 
-      cookies {
-        forward = "all"
+      forwarded_values {
+        query_string = "true"
+        headers      = ["*"]
+
+        cookies {
+          forward = "all"
+        }
       }
     }
   }
