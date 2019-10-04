@@ -33,3 +33,7 @@ variable "lambda" {
   default     = {}
   description = "Lambda@edge values for S3 Signature"
 }
+variable "lambda_policy" {
+  default     = {}
+  description = "Lambda@edge values for S3 Signature"
+}
