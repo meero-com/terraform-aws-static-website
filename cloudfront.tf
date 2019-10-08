@@ -12,7 +12,7 @@ resource "aws_cloudfront_distribution" "web_dist" {
   comment             = var.service_name
   default_root_object = "index.html"
   price_class         = "PriceClass_200"
-  aliases = var.domain_names
+  aliases             = var.domain_names
 
   origin {
     domain_name = aws_s3_bucket.hosting.bucket_regional_domain_name
@@ -26,14 +26,14 @@ resource "aws_cloudfront_distribution" "web_dist" {
 
   # SPA用のエラーハンドリング
   custom_error_response {
-    error_code = 403
-    response_code = 200
+    error_code         = 403
+    response_code      = 200
     response_page_path = "/index.html"
   }
 
   # ifが使えないのでdynamicを使う
   dynamic logging_config {
-    for_each = var.save_access_log ? { "dummy": "dummy" } : {}
+    for_each = var.save_access_log ? { "dummy" : "dummy" } : {}
 
     content {
       include_cookies = true
@@ -62,6 +62,36 @@ resource "aws_cloudfront_distribution" "web_dist" {
     max_ttl                = 86400
   }
 
+  dynamic ordered_cache_behavior {
+    for_each = var.activate_lambda_sign ? { "dummy" : "dummy" } : {}
+
+    content {
+
+      path_pattern = "/upload/v4/sign"
+
+      allowed_methods  = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+      cached_methods   = ["GET", "HEAD"]
+      target_origin_id = local.s3_origin_id
+
+      viewer_protocol_policy = "redirect-to-https"
+
+      lambda_function_association {
+        lambda_arn   = aws_lambda_function.this.qualified_arn
+        event_type   = "viewer-request"
+        include_body = true
+      }
+
+      forwarded_values {
+        query_string = "true"
+        headers      = ["Host", "cache-control", "context-type", "content-encoding", "x-meero-region"]
+
+        cookies {
+          forward = "all"
+        }
+      }
+    }
+  }
+
   restrictions {
     geo_restriction {
       restriction_type = "none"
@@ -69,8 +99,8 @@ resource "aws_cloudfront_distribution" "web_dist" {
   }
 
   viewer_certificate {
-    acm_certificate_arn = aws_acm_certificate_validation.cert.certificate_arn
+    acm_certificate_arn      = aws_acm_certificate_validation.cert.certificate_arn
     minimum_protocol_version = "TLSv1.1_2016"
-    ssl_support_method = "sni-only"
+    ssl_support_method       = "sni-only"
   }
 }
