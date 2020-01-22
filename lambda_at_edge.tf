@@ -4,7 +4,7 @@ resource "aws_lambda_function" "this" {
   runtime       = "nodejs8.10"
   function_name = var.lambda["function_name"]
   handler       = "src/lambda.default"
-  role          = aws_iam_role.iam_for_lambda.arn
+  role          = aws_iam_role.iam_for_lambda[count.index].arn
   publish       = true
 }
 
@@ -34,13 +34,13 @@ data "aws_iam_policy_document" "policy" {
 resource "aws_iam_policy" "policy_for_lambda" {
   count  = var.activate_lambda_sign ? 1 : 0
   name   = var.lambda["function_name"]
-  policy = data.aws_iam_policy_document.policy.json
+  policy = data.aws_iam_policy_document.policy[count.index].json
 }
 
 resource "aws_iam_policy_attachment" "lambda-attach" {
   count      = var.activate_lambda_sign ? 1 : 0
   name       = "lambda-attachment"
-  roles      = [aws_iam_role.iam_for_lambda.name]
-  policy_arn = aws_iam_policy.policy_for_lambda.arn
+  roles      = [aws_iam_role.iam_for_lambda[count.index].name]
+  policy_arn = aws_iam_policy.policy_for_lambda[count.index].arn
 }
 
