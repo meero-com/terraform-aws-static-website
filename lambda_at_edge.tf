@@ -1,7 +1,7 @@
 resource "aws_lambda_function" "this" {
   count         = var.activate_lambda_sign ? 1 : 0
   filename      = var.lambda["filename"]
-  runtime       = "nodejs8.10"
+  runtime       = "nodejs12.x"
   function_name = var.lambda["function_name"]
   handler       = "src/lambda.default"
   role          = aws_iam_role.iam_for_lambda[count.index].arn
