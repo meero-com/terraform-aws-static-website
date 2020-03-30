@@ -76,7 +76,7 @@ resource "aws_cloudfront_distribution" "web_dist" {
       viewer_protocol_policy = "redirect-to-https"
 
       lambda_function_association {
-        lambda_arn   = aws_lambda_function.this.qualified_arn
+        lambda_arn   = element(aws_lambda_function.this.*.qualified_arn, 0)
         event_type   = "viewer-request"
         include_body = true
       }
