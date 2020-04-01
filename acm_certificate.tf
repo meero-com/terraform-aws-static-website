@@ -2,7 +2,11 @@
 provider "aws" {
   alias = "us-east-1"
   region = "us-east-1"
-  profile = var.aws_profile
+  profile = var.aws["profile"]
+  assume_role {
+    role_arn     = var.aws["role_arn"]
+    session_name = "TERRAFORM"
+  }
 }
 
 resource "aws_acm_certificate" "cert" {

@@ -1,8 +1,10 @@
 variable "service_name" {
   description = "tagged with service name"
 }
-variable "aws_profile" {
-  description = "aws profile name"
+variable "aws" {
+  description = "AWS provider configuration"
+  type        = map
+  default     = {}
 }
 variable "domain_names" {
   description = "domain names"
