@@ -39,3 +39,8 @@ variable "lambda_policy" {
   default     = {}
   description = "Lambda@edge values for S3 Signature"
 }
+variable "bucket_policy" {
+  type        = list
+  description  = "List of additional bucket policies"
+  default     = []
+}

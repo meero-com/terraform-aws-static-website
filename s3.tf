@@ -14,6 +14,18 @@ data "aws_iam_policy_document" "bucket_policy" {
       identifiers = ["arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${aws_cloudfront_origin_access_identity.origin_access_identity.id}"]
     }
   }
+  dynamic "statement" {
+    for_each = [ for s in var.bucket_policy : {
+      actions   = s.actions
+      effect    = s.effect
+      resources = s.resources
+    }]
+    content {
+      actions   = lookup(statement.value, "actions", null)
+      effect    = lookup(statement.value, "effect", null)
+      resources = lookup(statement.value, "resources", null)
+    }
+  }
 }
 
 resource "aws_s3_bucket" "hosting" {
