@@ -12,12 +12,19 @@ resource "aws_route53_record" "www" {
 }
 
 resource "aws_route53_record" "cert_validation" {
-  count   = length(var.domain_names)
-  name    = lookup(aws_acm_certificate.cert.domain_validation_options[count.index], "resource_record_name")
-  type    = lookup(aws_acm_certificate.cert.domain_validation_options[count.index], "resource_record_type")
-  records = [lookup(aws_acm_certificate.cert.domain_validation_options[count.index], "resource_record_value")]
-  zone_id = var.route53_zone_id
-  ttl     = 60
+  for_each = {
+    for dvo in aws_acm_certificate.cert.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = var.route53_zone_id
 
   lifecycle {
     ignore_changes = ["fqdn"]
